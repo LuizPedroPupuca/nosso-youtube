@@ -15,18 +15,33 @@ public class Video {
     private String link;
     @Column(nullable = false)
     private Integer visualizacoes;
-    @Column(nullable = false)
-    private Integer gostei;//joinha para cima
-    @Column(nullable = false)
-    private Integer naoGostei;//joinha para baixo
+    @OneToOne(mappedBy = "video", cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE})
+    private QuantidadeLikes quantidadeLikes;
 
-    public Video(String titulo, String descricao, String link) {
+    @Version
+    private int version;
+
+    public Video(String titulo, String descricao, String link, Integer visualizacoes) {
         this.titulo = titulo;
         this.descricao = descricao;
         this.link = link;
-        this.visualizacoes=0;
-        this.gostei=0;
-        this.naoGostei=0;
+        this.visualizacoes = visualizacoes;
+        this.quantidadeLikes = new QuantidadeLikes(this);
+    }
+
+    public void incrementaGostei(){
+        this.quantidadeLikes.incrementaGostei();
+    }
+
+    public void incrementaNaoGostei(){
+        this.quantidadeLikes.incrementaNaoGostei();
+    }
+
+    public void atualiza(VideoRequest videoRequest){
+        this.titulo = videoRequest.getTitulo();
+        this.descricao = videoRequest.getDescricao();
+        this.link = videoRequest.getLink();
+        this.visualizacoes = videoRequest.getVisualizacoes();
     }
 
     /**
