@@ -4,6 +4,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
+import org.springframework.web.util.UriComponentsBuilder;
+
+import java.net.URI;
 
 @RestController
 public class VideoController {
@@ -15,10 +18,15 @@ public class VideoController {
     }
 
     @PostMapping("/cadastra-video")
-    public ResponseEntity<?> cadastra(@RequestBody VideoRequest videoRequest){
+    public ResponseEntity<?> cadastra(@RequestBody VideoRequest videoRequest, UriComponentsBuilder uriComponentsBuilder){
         Video video = videoRequest.toModel();
         videoRepository.save(video);
-        return ResponseEntity.noContent().build();
+
+        URI location = uriComponentsBuilder.path("/video/{id}")
+                .buildAndExpand(video.getId())
+                .toUri();
+
+        return ResponseEntity.created(location).build();
 
     }
 
